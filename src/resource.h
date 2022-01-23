@@ -35,12 +35,14 @@ namespace cg
 	template<typename T>
 	inline resource<T>::resource(size_t size)
 	{
-		THROW_ERROR("Not implemented yet");
+		data.resize(size);
+		stride = 0;
 	}
 	template<typename T>
 	inline resource<T>::resource(size_t x_size, size_t y_size)
 	{
-		THROW_ERROR("Not implemented yet");
+		data.resize(x_size * y_size);
+		stride = x_size;
 	}
 	template<typename T>
 	inline resource<T>::~resource()
@@ -49,45 +51,44 @@ namespace cg
 	template<typename T>
 	inline const T* resource<T>::get_data()
 	{
-		THROW_ERROR("Not implemented yet");
-		return nullptr;
+		return data.data();
 	}
 	template<typename T>
 	inline T& resource<T>::item(size_t item)
 	{
-		THROW_ERROR("Not implemented yet");
+		return data.at(item);
 	}
 	template<typename T>
 	inline T& resource<T>::item(size_t x, size_t y)
 	{
-		THROW_ERROR("Not implemented yet");
+		return data.at(stride * y + x);
 	}
 	template<typename T>
 	inline size_t resource<T>::get_size_in_bytes() const
 	{
-		THROW_ERROR("Not implemented yet");
+		return data.size() * item_size;
 	}
 	template<typename T>
 	inline size_t resource<T>::get_number_of_elements() const
 	{
-		THROW_ERROR("Not implemented yet");
+		return data.size();
 	}
 
 	template<typename T>
 	inline size_t resource<T>::get_stride() const
 	{
-		THROW_ERROR("Not implemented yet");
+		return stride;
 	}
 
 	struct color
 	{
 		static color from_float3(const float3& in)
 		{
-			THROW_ERROR("Not implemented yet");
+			return color{in.x,in.y,in.z};
 		};
 		float3 to_float3() const
 		{
-			THROW_ERROR("Not implemented yet");
+			return float3 {r,g,b};
 		}
 		float r;
 		float g;
@@ -98,15 +99,27 @@ namespace cg
 	{
 		static unsigned_color from_color(const color& color)
 		{
-			THROW_ERROR("Not implemented yet");
+			unsigned_color out{};
+			out.r = std::clamp(static_cast<int>(color.r * 255.f), 0, 255);
+			out.g = std::clamp(static_cast<int>(color.g * 255.f), 0, 255);
+			out.b = std::clamp(static_cast<int>(color.b * 255.f), 0, 255);
+			return out;
 		};
 		static unsigned_color from_float3(const float3& color)
 		{
-			THROW_ERROR("Not implemented yet");
+			unsigned_color out{};
+			float3 preprocessed = clamp(255.f * color, 0.f, 255.f);
+			out.r = static_cast<unsigned char>(preprocessed.x);
+			out.g = static_cast<unsigned char>(preprocessed.y);
+			out.b = static_cast<unsigned char>(preprocessed.z);
+			return out;
 		}
 		float3 to_float3() const
 		{
-			THROW_ERROR("Not implemented yet");
+			return float3 {static_cast<float>(r) / 255.f,
+						  static_cast<float>(g) / 255.f,
+						  static_cast<float>(b) / 255.f
+			};
 		};
 		unsigned char r;
 		unsigned char g;
